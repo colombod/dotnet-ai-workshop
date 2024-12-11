@@ -20,7 +20,7 @@ public class StructuredChatClient : IStructuredPredictor
         {
             AIParserFunction aiParserFunction = new(type);
             _nameToParserTool[aiParserFunction.Metadata.Name] = aiParserFunction;
-            _nameToType[aiParserFunction.Metadata.Name] = aiParserFunction.Type;
+            _nameToType[aiParserFunction.Metadata.Name] = type;
         }
     }
 
@@ -32,11 +32,8 @@ public class StructuredChatClient : IStructuredPredictor
     public async Task<StructuredPredictionResult> PredictAsync(IList<ChatMessage> messages, ChatOptions options, CancellationToken cancellationToken)
     {
 
-        var localOptions = options?.Clone() ?? new ChatOptions();
-        if (localOptions.Tools is null)
-        {
-            localOptions.Tools = new List<AITool>();
-        }
+        var localOptions = options.Clone();
+        localOptions.Tools ??= new List<AITool>();
 
         if (localOptions.Tools?.Count == 0)
         {
@@ -45,9 +42,9 @@ public class StructuredChatClient : IStructuredPredictor
         else
         {
 
-            foreach (var aitool in _nameToParserTool.Values.Cast<AITool>().ToList())
+            foreach (var tool in _nameToParserTool.Values.Cast<AITool>().ToList())
             {
-                localOptions.Tools!.Add(aitool);
+                localOptions.Tools!.Add(tool);
             }
         }
         localOptions.ToolMode = ChatToolMode.RequireAny;
