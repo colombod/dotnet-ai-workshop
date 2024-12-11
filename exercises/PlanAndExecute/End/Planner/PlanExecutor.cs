@@ -2,9 +2,11 @@
 
 namespace Planner;
 
+using static Plan;
+
 public class PlanExecutor(IChatClient chatClient)
 {
-    public async Task<ExecutionResult> ExecutePlanStep(Plan plan)
+    public async Task<ExecutionResult> ExecutePlanStep(PlanWithSteps plan)
     {
         var planString = string.Join("\n", plan.Steps.Select((step,i) => $"{i+1}. {step.Action}"));
         var task = plan.Steps[0];

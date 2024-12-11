@@ -1,6 +1,6 @@
-﻿using System.ComponentModel;
+﻿//using System.ComponentModel;
 
-namespace Planner;
+//namespace Planner;
 
-[Description("The result of a plan")]
-public record PlanResult([Description("The outcome of the plan")] string Result);
+//[Description("The result of a plan")]
+//public record PlanResult([Description("The outcome of the plan")] string Result);

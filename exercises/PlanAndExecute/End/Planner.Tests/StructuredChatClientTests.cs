@@ -1,5 +1,7 @@
 ﻿using System.ClientModel;
 using Microsoft.Extensions.AI;
+using static Planner.Plan;
+using Azure.Identity;
 
 using Moq;
 
@@ -51,20 +53,24 @@ public class StructuredChatClientTests
 
         var endpoint = _configuration["meai:endpoint"] ?? string.Empty;
         var key = _configuration["meai:apikey"] ?? string.Empty;
-        var chatClient = new AzureOpenAIClient(
-                new Uri(endpoint!),
-                new ApiKeyCredential(key!))
 
-            .AsChatClient("gpt-4o-mini");
-        var client = new StructuredChatClient(chatClient, [typeof(Plan)]);
+        var client = new AzureOpenAIClient(
+            new Uri(endpoint),
+            new DefaultAzureCredential())
+                .AsChatClient("gpt-4o-mini");
 
-        var result = await client.PredictAsync([new ChatMessage(ChatRole.User, "create a plan to go to the moon")], new ChatOptions(), CancellationToken.None);
+        var result = await client.CompleteAsync<Plan>(
+            [
+                new ChatMessage(ChatRole.User, "create a plan to go to the moon")
+            ],
+            new ChatOptions(),
+            cancellationToken: CancellationToken.None);
 
         using var _ = new AssertionScope();
 
-        result.PredictionType.Should().Be(typeof(Plan));
+        result.Should().Be(typeof(Plan));
 
-        var plan = result.Value as Plan;
+        var plan = result.Result as PlanWithSteps;
 
         plan.Should().NotBeNull();
         plan!.Steps.Should().HaveCountGreaterThan(0);
@@ -76,26 +82,22 @@ public class StructuredChatClientTests
     {
         var endpoint = _configuration["meai:endpoint"] ?? string.Empty;
         var key = _configuration["meai:apikey"] ?? string.Empty;
-        var chatClient = new AzureOpenAIClient(
+
+        var client = new AzureOpenAIClient(
             new Uri(endpoint),
-            new ApiKeyCredential(key))
+            new DefaultAzureCredential())
+                .AsChatClient("gpt-4o-mini");
 
-            .AsChatClient("gpt-4o-mini");
-        var client = new StructuredChatClient(chatClient, [typeof(Plan), typeof(PlanResult)]);
-
-        var result = await client.PredictAsync([
+        var result = await client.CompleteAsync<Plan>([
             new ChatMessage(ChatRole.System, "Create a plan if the user asks for help on how to achieve a goal, if is clear what to do then just present a result"),
-            new ChatMessage(ChatRole.User, "We got on the moon.")], new ChatOptions(), CancellationToken.None);
+            new ChatMessage(ChatRole.User, "We got on the moon.")], new ChatOptions(), cancellationToken: CancellationToken.None);
 
         using var _ = new AssertionScope();
 
-        result.PredictionType.Should().Be(typeof(PlanResult));
+        result.Should().Be(typeof(PlanResult));
 
-        var planResult = result.Value as PlanResult;
+        var planResult = result.Result as PlanResult;
 
         planResult.Should().NotBeNull();
     }
 }
-
-
-
