@@ -14,7 +14,7 @@ public class PlanEvaluatorTests
 
     public PlanEvaluatorTests()
     {
-        var builder = new ConfigurationBuilder()
+        IConfigurationBuilder builder = new ConfigurationBuilder()
             .AddUserSecrets<StructuredChatClientTests>();
         _configuration = builder.Build();
     }
@@ -24,14 +24,14 @@ public class PlanEvaluatorTests
     {
         string endpoint = _configuration["meai:endpoint"] ?? string.Empty;
         string key = _configuration["meai:apikey"] ?? string.Empty;
-        var chatClient = new AzureOpenAIClient(
+        IChatClient chatClient = new AzureOpenAIClient(
                 new Uri(endpoint),
                 new ApiKeyCredential(key))
 
             .AsChatClient("gpt-4o-mini");
-        var planEvaluator = new PlanEvaluator(chatClient);
+        PlanEvaluator planEvaluator = new (chatClient);
 
-        var plan = new Plan([
+        Plan plan = new ([
             new PlanStep("calculate necessary fuel for spaceship to cover distance between earth and the moon")
         ]);
 
@@ -43,11 +43,11 @@ public class PlanEvaluatorTests
             new("calculate necessary fuel for spaceship to cover distance between earth and the moon", "The ship will consume 384.4 gallons to cover the distance between the earth adn the moon")
         ];
 
-        var planOrResult = await planEvaluator.EvaluatePlanAsync(task, plan, previousSteps);
+        PlanOrResult planOrResult = await planEvaluator.EvaluatePlanAsync(task, plan, previousSteps);
 
         using var scope = new AssertionScope();
         planOrResult.Result.Should().NotBeNull();
-        planOrResult.Result.Outcome.Should().NotBeNullOrWhiteSpace();
+        planOrResult.Result!.Outcome.Should().NotBeNullOrWhiteSpace();
         planOrResult.Result.Outcome.Should().Contain("384.4");
     }
 
@@ -56,14 +56,14 @@ public class PlanEvaluatorTests
     {
         string endpoint = _configuration["meai:endpoint"] ?? string.Empty;
         string key = _configuration["meai:apikey"] ?? string.Empty;
-        var chatClient = new AzureOpenAIClient(
+        IChatClient chatClient = new AzureOpenAIClient(
                 new Uri(endpoint),
                 new ApiKeyCredential(key))
 
             .AsChatClient("gpt-4o-mini");
         var planEvaluator = new PlanEvaluator(chatClient);
 
-        var plan = new Plan([
+        Plan plan = new ([
             new PlanStep("find distance from earth to the moon"),
             new PlanStep("find out ship fuel consumptions"),
             new PlanStep("calculate necessary fuel for the spaceship to cover the distance")
@@ -75,7 +75,7 @@ public class PlanEvaluatorTests
             new PanStepExecutionResult("find distance from earth to the moon", "The distance from earth to the moon is 384,400 km")
         ];
 
-        var planOrResult = await planEvaluator.EvaluatePlanAsync(task, plan, previousSteps);
+        PlanOrResult planOrResult = await planEvaluator.EvaluatePlanAsync(task, plan, previousSteps);
 
         using var scope = new AssertionScope();
 

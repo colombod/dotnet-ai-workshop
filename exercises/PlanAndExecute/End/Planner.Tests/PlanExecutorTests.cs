@@ -14,7 +14,7 @@ public class PlanExecutorTests
 
     public PlanExecutorTests()
     {
-        var builder = new ConfigurationBuilder()
+        IConfigurationBuilder builder = new ConfigurationBuilder()
             .AddUserSecrets<StructuredChatClientTests>();
         _configuration = builder.Build();
     }
@@ -24,7 +24,7 @@ public class PlanExecutorTests
     {
         string endpoint = _configuration["meai:endpoint"] ?? string.Empty;
         string key = _configuration["meai:apikey"] ?? string.Empty;
-        var chatClient = new AzureOpenAIClient(
+        IChatClient chatClient = new AzureOpenAIClient(
                 new Uri(endpoint),
                 new ApiKeyCredential(key))
 
@@ -37,7 +37,7 @@ public class PlanExecutorTests
             new PlanStep("calculate necessary fuel for spaceship")
         ]);
 
-        var result = await executor.ExecutePlanStep(plan);
+        PanStepExecutionResult result = await executor.ExecutePlanStep(plan);
         using var scope = new AssertionScope();
 
         result.Should().NotBeNull();

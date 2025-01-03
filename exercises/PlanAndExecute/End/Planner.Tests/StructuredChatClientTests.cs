@@ -22,7 +22,7 @@ public class StructuredChatClientTests
 
     public StructuredChatClientTests()
     {
-        var builder = new ConfigurationBuilder()
+        IConfigurationBuilder builder = new ConfigurationBuilder()
             .AddUserSecrets<StructuredChatClientTests>();
 
         _configuration = builder.Build();
@@ -51,14 +51,14 @@ public class StructuredChatClientTests
 
         string endpoint = _configuration["meai:endpoint"] ?? string.Empty;
         string key = _configuration["meai:apikey"] ?? string.Empty;
-        var chatClient = new AzureOpenAIClient(
+        IChatClient chatClient = new AzureOpenAIClient(
                 new Uri(endpoint!),
                 new ApiKeyCredential(key!))
 
             .AsChatClient("gpt-4o-mini");
         var client = new StructuredChatClient(chatClient, [typeof(Plan)]);
 
-        var result = await client.PredictAsync([new ChatMessage(ChatRole.User, "create a plan to go to the moon")], new ChatOptions(), CancellationToken.None);
+        StructuredPredictionResult result = await client.PredictAsync([new ChatMessage(ChatRole.User, "create a plan to go to the moon")], new ChatOptions(), CancellationToken.None);
 
         using var _ = new AssertionScope();
 
@@ -76,14 +76,14 @@ public class StructuredChatClientTests
     {
         string endpoint = _configuration["meai:endpoint"] ?? string.Empty;
         string key = _configuration["meai:apikey"] ?? string.Empty;
-        var chatClient = new AzureOpenAIClient(
+        IChatClient chatClient = new AzureOpenAIClient(
             new Uri(endpoint),
             new ApiKeyCredential(key))
 
             .AsChatClient("gpt-4o-mini");
         var client = new StructuredChatClient(chatClient, [typeof(Plan), typeof(PlanResult)]);
 
-        var result = await client.PredictAsync([
+        StructuredPredictionResult result = await client.PredictAsync([
             new ChatMessage(ChatRole.System, "Create a plan if the user asks for help on how to achieve a goal, if is clear what to do then just present a result"),
             new ChatMessage(ChatRole.User, "We got on the moon.")], new ChatOptions(), CancellationToken.None);
 

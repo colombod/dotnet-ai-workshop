@@ -8,14 +8,14 @@ public class PlanExecutor(IChatClient chatClient)
         CancellationToken cancellationToken = default)
     {
         string planString = string.Join("\n", plan.Steps.Select((step,i) => $"{i+1}. {step.Action}"));
-        var task = plan.Steps[0];
+        PlanStep task = plan.Steps[0];
         string prompt = $"""
                          For the following plan:
                          {planString}
 
                          You are tasked with executing step 1, {task.Action}.
                          """;
-        var response = await chatClient.CompleteAsync([new ChatMessage(ChatRole.User, prompt)], options, cancellationToken: cancellationToken);
+        ChatCompletion response = await chatClient.CompleteAsync([new ChatMessage(ChatRole.User, prompt)], options, cancellationToken: cancellationToken);
         string? output = response.Message.Text;
         return new PanStepExecutionResult(task.Action, Output:output??string.Empty);
 

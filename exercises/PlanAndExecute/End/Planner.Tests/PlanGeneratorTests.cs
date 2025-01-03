@@ -13,7 +13,7 @@ public class PlanGeneratorTests
 
     public PlanGeneratorTests()
     {
-        var builder = new ConfigurationBuilder()
+        IConfigurationBuilder builder = new ConfigurationBuilder()
             .AddUserSecrets<StructuredChatClientTests>();
         _configuration = builder.Build();
     }
@@ -24,14 +24,14 @@ public class PlanGeneratorTests
     {
         string endpoint = _configuration["meai:endpoint"] ?? string.Empty;
         string key = _configuration["meai:apikey"] ?? string.Empty;
-        var chatClient = new AzureOpenAIClient(
+        IChatClient chatClient = new AzureOpenAIClient(
                 new Uri(endpoint),
                 new ApiKeyCredential(key))
 
             .AsChatClient("gpt-4o-mini");
         var planGenerator = new PlanGenerator(chatClient);
 
-        var plan = await planGenerator.GeneratePlanSync("find how much fuel a spaceship needs to reach the moon from earth", default);
+        Plan plan = await planGenerator.GeneratePlanSync("find how much fuel a spaceship needs to reach the moon from earth", default);
 
         plan.Steps.Length.Should().BeGreaterThanOrEqualTo(1);
     }

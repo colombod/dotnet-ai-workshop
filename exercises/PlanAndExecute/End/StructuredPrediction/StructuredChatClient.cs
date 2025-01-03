@@ -16,7 +16,7 @@ public class StructuredChatClient : IStructuredPredictor
 
     private void GenerateTools(Type[] types)
     {
-        foreach (var type in types)
+        foreach (Type type in types)
         {
             AIParserFunction aiParserFunction = new(type);
             _nameToParserTool[aiParserFunction.Metadata.Name] = aiParserFunction;
@@ -31,9 +31,9 @@ public class StructuredChatClient : IStructuredPredictor
 
     public async Task<StructuredPredictionResult> PredictAsync(IList<ChatMessage> messages, ChatOptions options, CancellationToken cancellationToken)
     {
-        var evaluationResponse = await _client.CompleteAsync(messages, options, cancellationToken).ConfigureAwait(false);
+        ChatCompletion evaluationResponse = await _client.CompleteAsync(messages, options, cancellationToken).ConfigureAwait(false);
 
-        var localOptions = options.Clone();
+        ChatOptions localOptions = options.Clone();
         localOptions.Tools ??= new List<AITool>();
 
         if (localOptions.Tools?.Count == 0)
@@ -43,14 +43,14 @@ public class StructuredChatClient : IStructuredPredictor
         else
         {
 
-            foreach (var tool in _nameToParserTool.Values.Cast<AITool>().ToList())
+            foreach (AITool? tool in _nameToParserTool.Values.Cast<AITool>().ToList())
             {
                 localOptions.Tools!.Add(tool);
             }
         }
         localOptions.ToolMode = ChatToolMode.RequireAny;
-        
-        var response = await _client.CompleteAsync([
+
+        ChatCompletion response = await _client.CompleteAsync([
             new ChatMessage(ChatRole.System, "Only use the most appropriate tool, only one tool call is allowed."),
             ..messages
         ], localOptions, cancellationToken).ConfigureAwait(false);
@@ -68,13 +68,13 @@ public class StructuredChatClient : IStructuredPredictor
 
         FunctionCallContent functionCallContent = functionCallContents[0];
 
-        if (!_nameToParserTool.TryGetValue(functionCallContent.Name, out var aiParserTool))
+        if (!_nameToParserTool.TryGetValue(functionCallContent.Name, out AIParserFunction? aiParserTool))
         {
             throw new InvalidOperationException($"Unexpected function call: {functionCallContent.Name}");
         }
 
         object? result = await aiParserTool.InvokeAsync(functionCallContent.Arguments, cancellationToken);
-        var type = _nameToType[aiParserTool.Metadata.Name];
+        Type type = _nameToType[aiParserTool.Metadata.Name];
 
         return new StructuredPredictionResult(type, result);
     }

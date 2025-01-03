@@ -21,14 +21,14 @@ public class AIParserFunction : AIFunction
     public AIParserFunction(Type type)
     {
         _type = type;
-        var schemaElement = AIJsonUtilities.CreateJsonSchema(
+        JsonElement schemaElement = AIJsonUtilities.CreateJsonSchema(
             type: type,
             serializerOptions: AIJsonUtilities.DefaultOptions,
             inferenceOptions: _inferenceOptions);
 
-        var propertiesElement = schemaElement.GetProperty("properties");
+        JsonElement propertiesElement = schemaElement.GetProperty("properties");
         var parameters = new List<AIFunctionParameterMetadata>();
-        foreach (var p in propertiesElement.EnumerateObject())
+        foreach (JsonProperty p in propertiesElement.EnumerateObject())
         {
             var parameterSchema = new AIFunctionParameterMetadata(p.Name) { Schema = p.Value, };
             parameters.Add(parameterSchema);
