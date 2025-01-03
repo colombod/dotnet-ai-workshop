@@ -39,7 +39,7 @@ public class PlanEvaluatorTests
 
         PanStepExecutionResult[] previousSteps = [
             new ("find distance from earth to the moon", "The distance from earth to the moon is 384,400 km"),
-            new ("Find out ship fuel consumptions", "The spaceship needs 1 gallons of fuel per 1000km"),
+            new ("find out ship fuel consumptions", "The spaceship needs 1 gallons of fuel per 1000km"),
             new("calculate necessary fuel for spaceship to cover distance between earth and the moon", "The ship will consume 384.4 gallons to cover the distance between the earth adn the moon")
         ];
 
@@ -65,8 +65,8 @@ public class PlanEvaluatorTests
 
         var plan = new Plan([
             new PlanStep("find distance from earth to the moon"),
-            new PlanStep("Find out ship fuel consumptions"),
-            new PlanStep("calculate necessary fuel for spaceship")
+            new PlanStep("find out ship fuel consumptions"),
+            new PlanStep("calculate necessary fuel for the spaceship to cover the distance")
         ]);
 
         string task = "find how much fuel a spaceship needs to reach the moon from earth";
@@ -77,6 +77,9 @@ public class PlanEvaluatorTests
 
         var planOrResult = await planEvaluator.EvaluatePlanAsync(task, plan, previousSteps);
 
+        using var scope = new AssertionScope();
+
         planOrResult.Plan.Should().NotBeNull();
+        planOrResult.Plan!.Steps.Should().HaveCountGreaterThan(1);
     }
 }

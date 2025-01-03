@@ -29,6 +29,7 @@ public class PlanExecutorTests
                 new ApiKeyCredential(key))
 
             .AsChatClient("gpt-4o-mini");
+        
 
         var executor = new PlanExecutor(chatClient);
         var plan = new Plan([
