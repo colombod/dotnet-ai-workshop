@@ -7,7 +7,7 @@ public class PlanGenerator(IChatClient chatClient)
 {
     private readonly IStructuredPredictor _structuredPredictor = chatClient.ToStructuredPredictor(typeof(Plan));
 
-    public async Task<Plan> GeneratePlanSync(string task, CancellationToken cancellationToken)
+    public async Task<Plan> GeneratePlanSync(string task, CancellationToken cancellationToken = default)
     {
         ChatMessage[] messages = [
             new(ChatRole.System,
@@ -20,9 +20,7 @@ public class PlanGenerator(IChatClient chatClient)
 
         var result = await _structuredPredictor.PredictAsync(messages, new ChatOptions(), cancellationToken);
 
-        var plan = result.Value as Plan;
-
-        if(plan is null)
+        if (result.Value is not Plan plan)
         {
             throw new InvalidOperationException("No plan generated");
         }
