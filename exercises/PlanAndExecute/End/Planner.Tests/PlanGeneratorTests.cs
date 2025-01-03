@@ -1,0 +1,38 @@
+﻿using System.ClientModel;
+using Azure.AI.OpenAI;
+using FluentAssertions;
+using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Configuration;
+using Xunit;
+
+namespace Planner.Tests;
+
+public class PlanGeneratorTests
+{
+    private readonly IConfiguration _configuration;
+
+    public PlanGeneratorTests()
+    {
+        var builder = new ConfigurationBuilder()
+            .AddUserSecrets<StructuredChatClientTests>();
+        _configuration = builder.Build();
+    }
+
+
+    [Fact]
+    public async Task generates_plan_to_accomplish_task()
+    {
+        string endpoint = _configuration["meai:endpoint"] ?? string.Empty;
+        string key = _configuration["meai:apikey"] ?? string.Empty;
+        var chatClient = new AzureOpenAIClient(
+                new Uri(endpoint),
+                new ApiKeyCredential(key))
+
+            .AsChatClient("gpt-4o-mini");
+        var planGenerator = new PlanGenerator(chatClient);
+
+        var plan = await planGenerator.GeneratePlanSync("find how much fuel a spaceship needs to reach the moon from earth", default);
+
+        plan.Steps.Length.Should().BeGreaterThanOrEqualTo(1);
+    }
+}

@@ -69,7 +69,7 @@ public class StructuredChatClient : IStructuredPredictor
             throw new InvalidOperationException($"Unexpected function call: {functionCallContent.Name}");
         }
 
-        var result = await aiParserTool.InvokeAsync(functionCallContent.Arguments, cancellationToken);
+        object? result = await aiParserTool.InvokeAsync(functionCallContent.Arguments, cancellationToken);
         var type = _nameToType[aiParserTool.Metadata.Name];
 
         return new StructuredPredictionResult(type, result);

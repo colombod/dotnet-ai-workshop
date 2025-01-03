@@ -49,8 +49,8 @@ public class StructuredChatClientTests
     public async Task AIParserTool_parses_a_conversation()
     {
 
-        var endpoint = _configuration["meai:endpoint"] ?? string.Empty;
-        var key = _configuration["meai:apikey"] ?? string.Empty;
+        string endpoint = _configuration["meai:endpoint"] ?? string.Empty;
+        string key = _configuration["meai:apikey"] ?? string.Empty;
         var chatClient = new AzureOpenAIClient(
                 new Uri(endpoint!),
                 new ApiKeyCredential(key!))
@@ -74,8 +74,8 @@ public class StructuredChatClientTests
     [Fact]
     public async Task AIParserTool_chooses_one_type_to_parse_a_conversation()
     {
-        var endpoint = _configuration["meai:endpoint"] ?? string.Empty;
-        var key = _configuration["meai:apikey"] ?? string.Empty;
+        string endpoint = _configuration["meai:endpoint"] ?? string.Empty;
+        string key = _configuration["meai:apikey"] ?? string.Empty;
         var chatClient = new AzureOpenAIClient(
             new Uri(endpoint),
             new ApiKeyCredential(key))
@@ -96,6 +96,3 @@ public class StructuredChatClientTests
         planResult.Should().NotBeNull();
     }
 }
-
-
-
