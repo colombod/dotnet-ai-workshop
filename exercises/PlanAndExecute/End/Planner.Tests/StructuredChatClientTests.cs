@@ -58,7 +58,7 @@ public class StructuredChatClientTests
             .AsChatClient("gpt-4o-mini");
         var client = new StructuredChatClient(chatClient, [typeof(Plan)]);
 
-        StructuredPredictionResult result = await client.PredictAsync([new ChatMessage(ChatRole.User, "create a plan to go to the moon")], new ChatOptions(), CancellationToken.None);
+        StructuredPredictionResult result = await client.PredictAsync([new ChatMessage(ChatRole.User, "create a plan to go to the moon")]);
 
         using var _ = new AssertionScope();
 
@@ -85,7 +85,7 @@ public class StructuredChatClientTests
 
         StructuredPredictionResult result = await client.PredictAsync([
             new ChatMessage(ChatRole.System, "Create a plan if the user asks for help on how to achieve a goal, if is clear what to do then just present a result"),
-            new ChatMessage(ChatRole.User, "We got on the moon.")], new ChatOptions(), CancellationToken.None);
+            new ChatMessage(ChatRole.User, "We got on the moon.")]);
 
         using var _ = new AssertionScope();
 

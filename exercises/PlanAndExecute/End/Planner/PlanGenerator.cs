@@ -18,7 +18,7 @@ public class PlanGenerator(IChatClient chatClient)
                 """),
             new(ChatRole.User, task)];
 
-        StructuredPredictionResult result = await _structuredPredictor.PredictAsync(messages, new ChatOptions(), cancellationToken);
+        StructuredPredictionResult result = await _structuredPredictor.PredictAsync(messages, cancellationToken);
 
         if (result.Value is not Plan plan)
         {

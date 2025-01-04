@@ -4,5 +4,5 @@ namespace StructuredPrediction;
 
 public interface IStructuredPredictor
 {
-    Task<StructuredPredictionResult> PredictAsync(IList<ChatMessage> messages, ChatOptions options, CancellationToken cancellationToken);
+    Task<StructuredPredictionResult> PredictAsync(IList<ChatMessage> messages, CancellationToken cancellationToken = default);
 }

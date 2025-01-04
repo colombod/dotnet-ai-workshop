@@ -40,7 +40,7 @@ public class PlanEvaluator(IChatClient chatClient)
                  """)
         ];
 
-        StructuredPredictionResult result = await _structuredPredictor.PredictAsync(messages, new ChatOptions(), cancellationToken);
+        StructuredPredictionResult result = await _structuredPredictor.PredictAsync(messages, cancellationToken);
         Plan? newPlan = result.Value as Plan;
         PlanResult? planResult = result.Value as PlanResult;
 

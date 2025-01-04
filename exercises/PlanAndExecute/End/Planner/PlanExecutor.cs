@@ -18,6 +18,5 @@ public class PlanExecutor(IChatClient chatClient)
         ChatCompletion response = await chatClient.CompleteAsync([new ChatMessage(ChatRole.User, prompt)], options, cancellationToken: cancellationToken);
         string? output = response.Message.Text;
         return new PanStepExecutionResult(task.Action, Output:output??string.Empty);
-
     }
 }

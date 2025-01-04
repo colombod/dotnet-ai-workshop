@@ -29,24 +29,14 @@ public class StructuredChatClient : IStructuredPredictor
         return _nameToType.Values;
     }
 
-    public async Task<StructuredPredictionResult> PredictAsync(IList<ChatMessage> messages, ChatOptions options, CancellationToken cancellationToken)
+    public async Task<StructuredPredictionResult> PredictAsync(IList<ChatMessage> messages, CancellationToken cancellationToken = default)
     {
-        ChatOptions localOptions = options.Clone();
-        localOptions.Tools ??= new List<AITool>();
-
-        if (localOptions.Tools?.Count == 0)
+        ChatOptions localOptions = new()
         {
-            localOptions.Tools = _nameToParserTool.Values.Cast<AITool>().ToList();
-        }
-        else
-        {
+            Tools = _nameToParserTool.Values.Cast<AITool>().ToList(),
+            ToolMode = ChatToolMode.RequireAny
+        };
 
-            foreach (AITool? tool in _nameToParserTool.Values.Cast<AITool>().ToList())
-            {
-                localOptions.Tools!.Add(tool);
-            }
-        }
-        localOptions.ToolMode = ChatToolMode.RequireAny;
 
         ChatCompletion response = await _client.CompleteAsync(
             [
