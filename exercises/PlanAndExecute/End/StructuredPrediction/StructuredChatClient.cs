@@ -31,8 +31,6 @@ public class StructuredChatClient : IStructuredPredictor
 
     public async Task<StructuredPredictionResult> PredictAsync(IList<ChatMessage> messages, ChatOptions options, CancellationToken cancellationToken)
     {
-        ChatCompletion evaluationResponse = await _client.CompleteAsync(messages, options, cancellationToken).ConfigureAwait(false);
-
         ChatOptions localOptions = options.Clone();
         localOptions.Tools ??= new List<AITool>();
 
@@ -50,10 +48,7 @@ public class StructuredChatClient : IStructuredPredictor
         }
         localOptions.ToolMode = ChatToolMode.RequireAny;
 
-        ChatCompletion response = await _client.CompleteAsync([
-            new ChatMessage(ChatRole.System, "Only use the most appropriate tool, only one tool call is allowed."),
-            ..messages
-        ], localOptions, cancellationToken).ConfigureAwait(false);
+        ChatCompletion response = await _client.CompleteAsync(messages, localOptions, cancellationToken).ConfigureAwait(false);
 
         FunctionCallContent[] functionCallContents = response.Message.Contents.OfType<FunctionCallContent>().ToArray();
         if (functionCallContents.Length == 0)

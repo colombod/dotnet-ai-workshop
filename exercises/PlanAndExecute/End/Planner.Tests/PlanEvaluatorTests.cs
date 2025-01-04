@@ -72,7 +72,7 @@ public class PlanEvaluatorTests
         string task = "find how much fuel a spaceship needs to reach the moon from earth";
 
         PanStepExecutionResult[] previousSteps = [
-            new PanStepExecutionResult("find distance from earth to the moon", "The distance from earth to the moon is 384,400 km")
+            new ("find distance from earth to the moon", "The distance from earth to the moon is 384,400 km")
         ];
 
         PlanOrResult planOrResult = await planEvaluator.EvaluatePlanAsync(task, plan, previousSteps);
