@@ -48,7 +48,11 @@ public class StructuredChatClient : IStructuredPredictor
         }
         localOptions.ToolMode = ChatToolMode.RequireAny;
 
-        ChatCompletion response = await _client.CompleteAsync(messages, localOptions, cancellationToken).ConfigureAwait(false);
+        ChatCompletion response = await _client.CompleteAsync(
+            [
+                new ChatMessage(ChatRole.System, "Select only the most appropriate tools, only one tool call is allowed."),
+                ..messages
+            ], localOptions, cancellationToken).ConfigureAwait(false);
 
         FunctionCallContent[] functionCallContents = response.Message.Contents.OfType<FunctionCallContent>().ToArray();
         if (functionCallContents.Length == 0)

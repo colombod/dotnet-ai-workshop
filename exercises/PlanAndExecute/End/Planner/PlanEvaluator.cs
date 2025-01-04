@@ -24,15 +24,19 @@ public class PlanEvaluator(IChatClient chatClient)
                  The result of the final step should be the final answer. Make sure that each step has all the information needed - do not skip steps.
 
                  Your objective was this:
-                 {task}
+                 <objective>{task}</objective>
 
                  Your original plan was this:
+                 <original_plan>
                  {plan}
+                 </original_plan>
 
                  You have currently done the follow steps:
+                 <past_steps>
                  {pastSteps}
+                 </past_steps>
 
-                 Update your plan accordingly. If no more steps are needed and you can return to the user, then respond with that as PlanResult. Otherwise, fill out the plan. Only add steps to the plan that still NEED to be done. Do not return previously done steps as part of the plan. If the past steps contains the final answer, then return that as the result, adding steps like 'report the result' is not appropriate and will fail the plan.
+                 Update your <original_plan> accordingly. If no more steps are needed to satisfy <objective> with the <past_steps> and you can return to the user, then respond with that as PlanResult. Otherwise, fill out the plan. Only add steps to the plan that still NEED to be done. Do not return previously done steps as part of the plan. If the past steps contains the final answer, then return that as the result, adding steps like 'report the result' is not appropriate and will fail the plan.
                  """)
         ];
 
