@@ -322,9 +322,10 @@ if (chunksForResponseGeneration.Count == 0 || averageScore < 0.7)
     List<PlanStepExecutionResult> pastSteps = [];
     var plan = await planGenerator.GeneratePlanAsync(task, cancellationToken);
     var options = new ChatOptions { Tools = [AIFunctionFactory.Create(SearchWeb)] };
-
-    while (true)
+    var maxSteps = plan.Steps.Length * 2;
+    while (maxSteps > 0)
     {
+
         var res = await stepExecutor.ExecutePlanStep(plan, options: options, cancellationToken: cancellationToken);
         pastSteps.Add(res);
 
@@ -332,6 +333,7 @@ if (chunksForResponseGeneration.Count == 0 || averageScore < 0.7)
         if (planOrResult.Plan is not null)
         {
             plan = planOrResult.Plan;
+            maxSteps--;
         }
         else
         {

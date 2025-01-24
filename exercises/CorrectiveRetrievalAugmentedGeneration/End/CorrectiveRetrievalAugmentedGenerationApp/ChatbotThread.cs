@@ -148,32 +148,33 @@ public class ChatbotThread(
                 ToolMode = ChatToolMode.Auto
             };
 
-            var res = await stepExecutor.ExecutePlanStep(plan, options: options, cancellationToken: cancellationToken);
-            pastSteps.Add(res);
-
-            var planOrResult = await evaluator.EvaluatePlanAsync(task, plan, pastSteps, cancellationToken);
-
-            while (planOrResult.Plan is not null)
+            var maxSteps = plan.Steps.Length * 2;
+            while (maxSteps > 0)
             {
-                plan = planOrResult.Plan;
-                res = await stepExecutor.ExecutePlanStep(plan, options: options, cancellationToken: cancellationToken);
+                var res = await stepExecutor.ExecutePlanStep(plan, options: options, cancellationToken: cancellationToken);
                 pastSteps.Add(res);
+                maxSteps--;
+                var planOrResult = await evaluator.EvaluatePlanAsync(task, plan, pastSteps, cancellationToken);
+                if (planOrResult.Plan is not null)
+                {
+                    plan = planOrResult.Plan;
+                }
+                else
+                {
+                    // Add the result to context
+                    if (planOrResult.Result is { } result)
+                    {
+                        var fakeId = chunksForResponseGeneration.Keys.Max() + 1;
+                        chunksForResponseGeneration[fakeId] = new Chunk(
+                            Id: fakeId,
+                            Text: result.Outcome,
+                            ProductId: currentProduct.ProductId,
+                            PageNumber: 1
+                        );
+                    }
 
-                planOrResult = await evaluator.EvaluatePlanAsync(task, plan, pastSteps, cancellationToken);
-            }
-
-            // we add a fake entry to the chunks by id so that we can add the answer to the context
-            ulong maxKey = chunksForResponseGeneration.Count == 0 ? 0 : chunksForResponseGeneration.Keys.Max();
-            ulong key = maxKey + 1;
-            if (planOrResult.Result is not null)
-            {
-                chunksForResponseGeneration[key] = new Chunk(
-
-                    Id: key,
-                    Text: planOrResult.Result.Outcome,
-                    ProductId: currentProduct.ProductId,
-                    PageNumber: 1
-                );
+                    break;
+                }
             }
         }
 
