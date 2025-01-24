@@ -340,7 +340,8 @@ if (chunksForResponseGeneration.Count == 0 || averageScore < 0.7)
             // Add the result to context
             if (planOrResult.Result is { } result)
             {
-                var fakeId = chunksForResponseGeneration.Keys.Max() + 1;
+                var maxKey = chunksForResponseGeneration.Count == 0 ? 0 : chunksForResponseGeneration.Keys.Max() ;
+                var fakeId = maxKey + 1;
                 chunksForResponseGeneration[fakeId] = new Chunk(
                     Id: fakeId,
                     Text: result.Outcome,
