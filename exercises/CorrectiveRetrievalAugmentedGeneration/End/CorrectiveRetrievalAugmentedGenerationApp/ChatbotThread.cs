@@ -117,16 +117,15 @@ public class ChatbotThread(
             async Task<string> SearchTool([Description("The questions we want to answer searching the web")] string userQuestion)
             {
                 var results = await searchTool!.SearchWebAsync(userQuestion, 3, cancellationToken);
-
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($" Web Search: {userQuestion}");
                 foreach (SearchResult searchResult in results)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"""
-                                      Corrective step using data from :{searchResult.Url}
-                                      Web Search: {userQuestion}
-                                      
-                                      Preview:
-                                      {searchResult.Snippet.Substring(0, Math.Min(100, searchResult.Snippet.Length))}....
+                                        Corrective step using data from :{searchResult.Url}
+                                        Preview:
+                                            {searchResult.Snippet.Substring(0, Math.Min(100, searchResult.Snippet.Length))}....
                                       
                                       """);
                 }
