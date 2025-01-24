@@ -291,7 +291,7 @@ Immediately **before** that comment, add the following block of code. It's a big
 
 ```cs
 // Corrective RAG
-if (chunksForResponseGeneration.Count < 2 || averageScore < 0.7)
+if (chunksForResponseGeneration.Count == 0 || averageScore < 0.7)
 {
     var planGenerator = new PlanGenerator(chatClient);
     var toolCallingClient = new FunctionInvokingChatClient(chatClient);

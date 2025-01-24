@@ -66,7 +66,7 @@ public class ChatbotThread(
         foreach (var retrievedContext in closestChunksById.Values)
         {
             var score = await contextRelevancyEvaluator.EvaluateAsync(userMessage, retrievedContext.Text, cancellationToken);
-            if (score.ContextRelevance!.ScoreNumber > 0.7)
+            if (score.ContextRelevance!.ScoreNumber >= 0.7)
             {
                 averageScore += score.ContextRelevance!.ScoreNumber;
                 chunksForResponseGeneration.Add(retrievedContext.Id, retrievedContext);
@@ -76,7 +76,7 @@ public class ChatbotThread(
         averageScore /= chunksForResponseGeneration.Count;
         // perform corrective retrieval if needed
 
-        if (chunksForResponseGeneration.Count < 2 || averageScore < 0.7)
+        if (chunksForResponseGeneration.Count == 0 || averageScore < 0.7)
         {
             var planGenerator = new PlanGenerator(chatClient);
 
