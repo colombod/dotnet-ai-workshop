@@ -88,7 +88,13 @@ public class ChatbotThread(
             string task = $"""
                            Given the <user_question>, search the product manuals for relevant information.
                            Look for information that may answer the question, and provide a response based on that information.
-                           The <context> was not enough to answer the question. Find the information that can complement the context to address the user question
+                           The <context> was not enough to answer the question. Find the information that can complement the context to address the user question.
+                           
+                           Take into account the user is enquiring about 
+                           ProductId: ${currentProduct.ProductId}
+                           Brand: ${currentProduct.Brand}
+                           Model: ${currentProduct.Model}
+                           Description: ${currentProduct.Description}
 
                            <user_question>
                            {userMessage}
@@ -112,6 +118,18 @@ public class ChatbotThread(
             {
                 var results = await searchTool!.SearchWebAsync(userQuestion, 3, cancellationToken);
 
+                foreach (SearchResult searchResult in results)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"""
+                                      Corrective step using data from :{searchResult.Url}
+                                      Web Search: {userQuestion}
+                                      
+                                      Preview:
+                                      {searchResult.Snippet.Substring(0, Math.Min(100, searchResult.Snippet.Length))}....
+                                      
+                                      """);
+                }
                 return string.Join("\n", results.Select(c => $"""
                                                               ## web page: {c.Url}
                                                               # Content

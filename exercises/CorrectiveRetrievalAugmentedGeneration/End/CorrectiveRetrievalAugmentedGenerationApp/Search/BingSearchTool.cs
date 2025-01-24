@@ -41,7 +41,16 @@ public class BingSearchTool(string bingSearchApiKey, HttpClient client, IReadOnl
             await JsonSerializer.DeserializeAsync<BingSearchResponse>(stream, s_jsonSerializerOptions,
                 cancellationToken) ??
             BingSearchResponse.Empty;
-        IEnumerable<SearchResult> selectedResults = result.WebPages.Value.Take(resultLimit);
+        IEnumerable<SearchResult> selectedResults = [];
+
+        try
+        {
+            selectedResults = result.WebPages.Value.Take(resultLimit);
+        }
+        catch
+        {
+
+        }
 
         return selectedResults;
 

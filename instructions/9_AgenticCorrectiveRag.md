@@ -257,6 +257,20 @@ private async Task<string> SearchWeb(
     CancellationToken cancellationToken = default)
 {
     var results = await searchTool!.SearchWebAsync(userQuestion, 3, cancellationToken);
+
+    foreach (SearchResult searchResult in results)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"""
+                            Corrective step using data from :{searchResult.Url}
+                            Web Search: {userQuestion}
+                            
+                            Preview:
+                            {searchResult.Snippet.Substring(0, Math.Min(100, searchResult.Snippet.Length))}....
+                            
+                            """);
+    }
+
     return string.Join("\n", results.Select(c => $"""
         ## web page: {c.Url}
         # Content
@@ -286,17 +300,23 @@ if (chunksForResponseGeneration.Count < 2 || averageScore < 0.7)
     var evaluator = new PlanEvaluator(chatClient);
 
     string task = $"""
-            Given the <user_question>, search the product manuals for relevant information.
-            Look for information that may answer the question, and provide a response based on that information.
-            The <context> was not enough to answer the question. Find the information that can complement the context to address the user question
+                    Given the <user_question>, search the product manuals for relevant information.
+                    Look for information that may answer the question, and provide a response based on that information.
+                    The <context> was not enough to answer the question. Find the information that can complement the context to address the user question.
+                    
+                    Take into account the user is enquiring about 
+                    ProductId: ${currentProduct.ProductId}
+                    Brand: ${currentProduct.Brand}
+                    Model: ${currentProduct.Model}
+                    Description: ${currentProduct.Description}
 
-            <user_question>
-            {userMessage}
-            </user_question>
+                    <user_question>
+                    {userMessage}
+                    </user_question>
 
-            <context>
-            {string.Join("\n", closestChunksById.Values.Select(c => $"<manual_extract id='{c.Id}'>{c.Text}</manual_extract>"))}
-            </context>
+                    <context>
+                    {string.Join("\n", closestChunksById.Values.Select(c => $"<manual_extract id='{c.Id}'>{c.Text}</manual_extract>"))}
+                    </context>
             """;
 
     List<PlanStepExecutionResult> pastSteps = [];

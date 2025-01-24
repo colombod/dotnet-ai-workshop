@@ -29,7 +29,7 @@ builder.Services.AddSingleton(new QdrantClient("127.0.0.1"));
 builder.Services.AddChatClient(innerChatClient);
 
 // bing
-builder.Services.AddSingleton(b =>
+builder.Services.AddSingleton<ISearchTool>(b =>
 {
     var httpClient = new HttpClient();
     return new BingSearchTool(
@@ -37,12 +37,12 @@ builder.Services.AddSingleton(b =>
         httpClient);
 });
 
-// DuckDuckGoSearchTool
-builder.Services.AddSingleton(b =>
-{
-    var httpClient = new HttpClient();
-    return new DuckDuckGoSearchTool(httpClient);
-});
+//// DuckDuckGoSearchTool
+//builder.Services.AddSingleton<ISearchTool>(b =>
+//{
+//    var httpClient = new HttpClient();
+//    return new DuckDuckGoSearchTool(httpClient);
+//});
 
 // Go
 await builder.Build().RunAsync();
