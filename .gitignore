@@ -16,3 +16,6 @@ exercises/**/nCrunchTemp_*.csproj
 exercises/**/.NCrunch_CorrectiveRetrievalAugmentedGeneration/
 
 .vscode/
+
+exercises/CorrectiveRetrievalAugmentedGeneration/qdrant_storage/
+
